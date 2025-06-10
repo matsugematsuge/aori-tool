@@ -1,11 +1,3 @@
-コードを書き換えて、テキストを入力して画像に反映し、出力できるようにします。HTML、JavaScriptのコードと、それぞれの説明を記載します。
-テキストを入力して画像に反映し、出力する機能を追加したコードを以下に示します。
-
-1. HTMLの修正 (index.html)
-<body> 内の適切な場所（例えば、「元画像をアップロード」のすぐ下）に、テキスト入力欄、テキスト描画用のボタン、およびダウンロードボタンを追加します。
-
-HTML
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -15,22 +7,34 @@ HTML
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>画像に透過画像を重ねるツール</h1>
+    <div class="container">
+        <h1>画像に透過画像を重ねるツール</h1>
 
-    <input type="file" id="originalImageInput" accept="image/*">
-    <input type="file" id="overlayImageInput" accept="image/*">
-    <br><br>
+        <p>元になる画像をアップロードしてください。固定の透過画像が自動で重ねられます。</p>
 
-    <div>
-        <label for="textInput">テキスト:</label>
-        <input type="text" id="textInput" value="ここにテキストを入力">
-        <button id="drawTextButton">テキストを描画</button>
+        <div class="input-section">
+            <label for="baseImageInput" class="button">
+                元画像をアップロード
+                <input type="file" id="baseImageInput" accept="image/*">
+            </label>
+        </div>
+
+        <div class="text-input-section">
+            <label for="inputText">描画するテキスト:</label>
+            <input type="text" id="inputText" placeholder="ここにテキストを入力" value="サンプルテキスト">
+            <button id="drawTextButton" class="button">テキストを描画</button>
+        </div>
+        <div class="canvas-area">
+            <canvas id="imageCanvas"></canvas>
+            <p id="message" class="hidden">画像を読み込み中です...</p>
+        </div>
+
+        <div class="controls-section">
+            <button id="downloadButton" disabled class="button primary">合成画像をダウンロード</button>
+        </div>
+
+        <p class="note">※処理は全てブラウザ上で行われるため、画像がサーバーにアップロードされることはありません。</p>
     </div>
-    <br>
-
-    <canvas id="combinedCanvas" width="500" height="500"></canvas>
-    <br>
-    <button id="downloadButton">画像をダウンロード</button>
 
     <script src="script.js"></script>
 </body>
