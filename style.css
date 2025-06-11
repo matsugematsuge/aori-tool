@@ -50,8 +50,6 @@ p {
     gap: 10px;
 }
 
-/* .text-controls-section のスタイルは削除 */
-
 .button {
     display: inline-block;
     background-color: #007bff;
@@ -164,7 +162,7 @@ button:disabled {
         box-sizing: border-box;
     }
 
-    .input-section, .controls-section, .text-input-section { /* text-controls-section は削除済み */
+    .input-section, .controls-section, .text-input-section {
         flex-direction: column;
         gap: 15px;
     }
