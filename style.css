@@ -122,14 +122,18 @@ input[type="file"] {
     display: none;
 }
 
-.text-input-section input[type="text"] {
+/* <textarea> 用のスタイル */
+.text-input-section textarea {
     padding: 10px 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1em;
     flex-grow: 1;
     max-width: 300px;
+    resize: vertical; /* 垂直方向のみリサイズ可能にする */
+    min-height: 60px; /* 最小の高さ */
 }
+/* 以前の input[type="text"] 用のスタイルは削除しました */
 
 .canvas-area {
     margin: 20px 0;
@@ -204,7 +208,8 @@ button:disabled {
         gap: 15px;
     }
 
-    .text-input-section input[type="text"] {
+    /* <textarea> 用のレスポンシブスタイル */
+    .text-input-section textarea {
         max-width: 100%;
         width: 100%;
         box-sizing: border-box;
