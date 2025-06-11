@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentText = inputText.value; // 初期テキスト
 
     // テキスト描画の固定設定
-    const fontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
+    // ★ここを修正しました：より汎用的なフォントに変更
+    const fontFamily = 'Arial, sans-serif'; // または 'Verdana, sans-serif' など
     const fillStyle = 'black'; // 黒に固定
     const strokeStyle = 'transparent'; // 縁は透明
     const lineWidth = 0; // 縁の太さ
@@ -37,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 透過画像の読み込み完了
     overlayImage.onload = () => {
         console.log('透過画像が読み込まれました。');
-        // 元画像があれば再描画を試みる
         if (baseImage) {
             drawImages();
         }
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             baseImage.onload = () => {
                 imageCanvas.width = baseImage.width;
                 imageCanvas.height = baseImage.height;
-                drawImages(); // 元画像読み込み後、初回描画
+                drawImages(); 
                 downloadButton.disabled = false;
                 messageElement.classList.add('hidden');
             };
@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     inputText.addEventListener('input', () => {
-        // リアルタイムでテキストプレビュー
         if (baseImage) {
             currentText = inputText.value;
             drawImages();
@@ -114,11 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPosXSpan.textContent = `${currentPosXOffset}px`;
         currentPosYSpan.textContent = `${currentPosYOffset}px`;
 
-        console.log('スライダーで設定されたフォントサイズ:', currentFontSize); // ★デバッグログ
-        console.log('Xオフセット:', currentPosXOffset, 'Yオフセット:', currentPosYOffset); // ★デバッグログ
+        console.log('スライダーで設定されたフォントサイズ:', currentFontSize); 
 
         if (baseImage) {
-            drawImages(); // 設定変更時にリアルタイムで再描画
+            drawImages(); 
         }
     }
 
@@ -141,12 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 画像とテキストを描画するメイン関数
     function drawImages() {
-        // Canvasのサイズが0の場合、描画しない
         if (imageCanvas.width === 0 || imageCanvas.height === 0) {
             return;
         }
 
-        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height); // Canvas全体をクリア
+        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height); 
 
         // 1. 元画像を背景に描画
         if (baseImage) {
@@ -186,18 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. テキストを描画
         if (currentText && baseImage) {
-            // Canvasコンテキストのスタイル設定
-            ctx.font = `${currentFontSize}px "${fontFamily}"`; 
+            ctx.font = `${currentFontSize}px "${fontFamily}"`; // currentFontSizeを使用
             ctx.fillStyle = fillStyle;
             ctx.strokeStyle = strokeStyle;
             ctx.lineWidth = lineWidth;
 
-            console.log('実際に描画に適用されるフォント設定文字列:', ctx.font); // ★デバッグログ
-            console.log('描画に適用されるフォントサイズ (currentFontSize):', currentFontSize); // ★デバッグログ
+            console.log('実際に描画に適用されるフォント設定文字列:', ctx.font); 
+            console.log('描画に適用されるフォントサイズ (currentFontSize):', currentFontSize); 
 
-            // テキストのX座標: 透過画像の左端位置 + スライダーのオフセット
             const textX = overlayDrawX + currentPosXOffset;
-            // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - スライダーのオフセット (透過画像の下端から上へ)
             const textY = overlayDrawY + overlayDrawHeight - currentPosYOffset;
 
             ctx.textAlign = 'left';
@@ -221,6 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 初期化 ---
-    downloadButton.disabled = true; // 初期状態ではダウンロードボタンを無効化
-    updateTextSettings(); // 初期表示時にスライダーの値を反映
+    downloadButton.disabled = true; 
+    updateTextSettings(); 
 });
