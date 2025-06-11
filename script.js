@@ -9,14 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawTextButton = document.getElementById('drawTextButton');
 
     // 固定するテキスト描画設定
-    const fixedFontSize = 24; // 24pxに固定
+    const fixedFontSize = 30; // 30pxに固定
     const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
     const fixedFillStyle = 'black'; // 黒に固定
     const fixedStrokeStyle = 'transparent'; // 縁は透明
     const fixedLineWidth = 0; // 縁の太さ
 
     // テキストの固定位置オフセット
-    const fixedOffsetX = 150; // 画像中央から左に150px移動した位置がテキストの左端
+    const fixedOffsetX = 150 + 20; // 中央から左に150px、さらに左に20px (合計170px)
     const fixedBottomOffset = 80; // 画像下端から80px上に固定
 
     let baseImage = null;
@@ -117,10 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let drawX, drawY;
 
             // 透過画像がCanvas（元画像）の幅に合わせて調整
+            // まずは幅に合わせて拡大/縮小
             drawWidth = imageCanvas.width;
             drawHeight = drawWidth / overlayAspect;
 
-            // もし高さがCanvasの高さより大きい場合は、高さを基準に調整
+            // もし幅に合わせて調整した高さがCanvasの高さより大きい場合は、高さを基準に調整
             if (drawHeight > imageCanvas.height) {
                 drawHeight = imageCanvas.height;
                 drawWidth = drawHeight * overlayAspect;
