@@ -50,59 +50,7 @@ p {
     gap: 10px;
 }
 
-.text-controls-section {
-    margin-bottom: 25px;
-    padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background-color: #fcfcfc;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-}
-
-.control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.control-group label {
-    font-weight: bold;
-    color: #555;
-}
-
-.control-group input[type="range"] {
-    flex-grow: 1;
-    min-width: 120px;
-}
-
-.control-group input[type="number"] {
-    width: 60px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: center;
-}
-
-/* フォント選択のスタイル */
-.control-group select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    font-size: 1em;
-    cursor: pointer;
-}
-.control-group select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
+/* .text-controls-section のスタイルは削除 */
 
 .button {
     display: inline-block;
@@ -216,34 +164,21 @@ button:disabled {
         box-sizing: border-box;
     }
 
-    .input-section, .controls-section, .text-input-section, .text-controls-section {
+    .input-section, .controls-section, .text-input-section { /* text-controls-section は削除済み */
         flex-direction: column;
         gap: 15px;
     }
 
-    .text-input-section input[type="text"],
-    .text-controls-section input[type="range"],
-    .text-controls-section input[type="number"],
-    .text-controls-section select { /* selectもフル幅に */
+    .text-input-section input[type="text"] {
         max-width: 100%;
         width: 100%;
         box-sizing: border-box;
     }
 
-    .text-input-section label,
-    .text-controls-section label {
+    .text-input-section label {
         width: 100%;
         text-align: left;
         margin-bottom: 5px;
-    }
-
-    .control-group {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-    }
-    .control-group span {
-        align-self: flex-start;
     }
 
     .canvas-area {
