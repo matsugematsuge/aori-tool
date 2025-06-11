@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputText = document.getElementById('inputText');
     const drawTextButton = document.getElementById('drawTextButton');
 
-    // スライダーと値表示要素の取得
     const fontSizeSlider = document.getElementById('fontSizeSlider');
     const currentFontSizeSpan = document.getElementById('currentFontSize');
     const posXSlider = document.getElementById('posXSlider');
@@ -20,30 +19,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFontSize = parseInt(fontSizeSlider.value);
     let currentPosXOffset = parseInt(posXSlider.value);
     let currentPosYOffset = parseInt(posYSlider.value);
+    let currentText = inputText.value; // 初期テキスト
 
     // テキスト描画の固定設定
-    // fixedFontSize は削除
-    const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
-    const fixedFillStyle = 'black'; // 黒に固定
-    const fixedStrokeStyle = 'transparent'; // 縁は透明
-    const fixedLineWidth = 0; // 縁の太さ
+    const fontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
+    const fillStyle = 'black'; // 黒に固定
+    const strokeStyle = 'transparent'; // 縁は透明
+    const lineWidth = 0; // 縁の太さ
 
     let baseImage = null;
     let overlayImage = new Image();
     overlayImage.src = 'overlay.png'; // 透過画像の名前は 'overlay.png'
     overlayImage.crossOrigin = "Anonymous"; // CORSエラーを避けるため
 
-    let currentText = inputText.value; // 初期テキスト
+    // --- イベントリスナー ---
 
-    // 透過画像が読み込まれても、ここでは描画をトリガーしない
+    // 透過画像の読み込み完了
     overlayImage.onload = () => {
         console.log('透過画像が読み込まれました。');
-        // 元画像が既に読み込まれている場合のみ、透過画像を再描画
+        // 元画像があれば再描画を試みる
         if (baseImage) {
             drawImages();
         }
     };
 
+    // 透過画像の読み込みエラー
     overlayImage.onerror = () => {
         console.error('透過画像の読み込みに失敗しました。パスを確認してください。');
         messageElement.textContent = 'エラー: 透過画像が見つかりません。';
@@ -53,50 +53,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // 元画像が選択されたときの処理
     baseImageInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
-        if (file) {
-            messageElement.textContent = '画像を読み込み中です...';
-            messageElement.classList.remove('hidden');
-            downloadButton.disabled = true;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                baseImage = new Image();
-                baseImage.onload = () => {
-                    // Canvasのサイズを元画像に合わせる (DPI非考慮)
-                    imageCanvas.width = baseImage.width;
-                    imageCanvas.height = baseImage.height;
-
-                    drawImages(); // 元画像が読み込まれたら描画
-                    downloadButton.disabled = false;
-                    messageElement.classList.add('hidden');
-                };
-                baseImage.onerror = () => {
-                    messageElement.textContent = 'エラー: 元画像の読み込みに失敗しました。';
-                    messageElement.classList.remove('hidden');
-                    downloadButton.disabled = true;
-                    baseImage = null;
-                    // 元画像が読み込めない場合はCanvasをクリア
-                    ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-                    imageCanvas.width = 0;
-                    imageCanvas.height = 0;
-                };
-                baseImage.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            baseImage = null; // 元画像をクリア
-            // 元画像がクリアされたらCanvasもクリア
-            ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-            imageCanvas.width = 0;
-            imageCanvas.height = 0;
-            downloadButton.disabled = true;
-            messageElement.classList.add('hidden');
+        if (!file) {
+            resetCanvasAndButtons();
+            return;
         }
+
+        messageElement.textContent = '画像を読み込み中です...';
+        messageElement.classList.remove('hidden');
+        downloadButton.disabled = true;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            baseImage = new Image();
+            baseImage.onload = () => {
+                imageCanvas.width = baseImage.width;
+                imageCanvas.height = baseImage.height;
+                drawImages(); // 元画像読み込み後、初回描画
+                downloadButton.disabled = false;
+                messageElement.classList.add('hidden');
+            };
+            baseImage.onerror = () => {
+                messageElement.textContent = 'エラー: 元画像の読み込みに失敗しました。';
+                messageElement.classList.remove('hidden');
+                resetCanvasAndButtons();
+            };
+            baseImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     });
 
-    // 「テキストを描画」ボタンがクリックされたときの処理
+    // 「テキストを描画」ボタンクリックまたはテキスト入力変更
     drawTextButton.addEventListener('click', () => {
-        if (baseImage) { // 元画像が読み込まれている場合のみ描画
+        if (baseImage) {
             currentText = inputText.value;
             drawImages();
         } else {
@@ -104,51 +92,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // テキスト入力欄が変更されたらリアルタイム描画
     inputText.addEventListener('input', () => {
+        // リアルタイムでテキストプレビュー
         if (baseImage) {
             currentText = inputText.value;
             drawImages();
         }
     });
 
-    // フォントサイズスライダーの変更イベント
-    fontSizeSlider.addEventListener('input', (event) => {
-        currentFontSize = parseInt(event.target.value);
+    // スライダー変更イベント
+    fontSizeSlider.addEventListener('input', updateTextSettings);
+    posXSlider.addEventListener('input', updateTextSettings);
+    posYSlider.addEventListener('input', updateTextSettings);
+
+    function updateTextSettings() {
+        currentFontSize = parseInt(fontSizeSlider.value);
+        currentPosXOffset = parseInt(posXSlider.value);
+        currentPosYOffset = parseInt(posYSlider.value);
+
         currentFontSizeSpan.textContent = `${currentFontSize}px`;
-        if (baseImage) {
-            drawImages();
-        }
-    });
-
-    // X位置スライダーの変更イベント
-    posXSlider.addEventListener('input', (event) => {
-        currentPosXOffset = parseInt(event.target.value);
         currentPosXSpan.textContent = `${currentPosXOffset}px`;
-        if (baseImage) {
-            drawImages();
-        }
-    });
-
-    // Y位置スライダーの変更イベント
-    posYSlider.addEventListener('input', (event) => {
-        currentPosYOffset = parseInt(event.target.value);
         currentPosYSpan.textContent = `${currentPosYOffset}px`;
+
         if (baseImage) {
-            drawImages();
+            drawImages(); // 設定変更時にリアルタイムで再描画
+        }
+    }
+
+    // ダウンロードボタンがクリックされたときの処理
+    downloadButton.addEventListener('click', () => {
+        if (baseImage && imageCanvas.width > 0 && imageCanvas.height > 0) {
+            const dataURL = imageCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'merged_image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            alert('合成する画像がありません。元画像をアップロードしてください。');
         }
     });
 
-    // 画像とテキストを描画する関数
+    // --- ヘルパー関数 ---
+
+    // 画像とテキストを描画するメイン関数
     function drawImages() {
         // Canvasのサイズが0の場合、描画しない
         if (imageCanvas.width === 0 || imageCanvas.height === 0) {
             return;
         }
 
-        // Canvasをクリアする前に、以前のDPIスケーリングがあればリセット
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
-        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height); // Canvas全体をクリア
 
         // 1. 元画像を背景に描画
         if (baseImage) {
@@ -158,4 +153,69 @@ document.addEventListener('DOMContentLoaded', () => {
         let overlayDrawX = 0;
         let overlayDrawY = 0;
         let overlayDrawWidth = 0;
-        let overlayDrawHeight =
+        let overlayDrawHeight = 0;
+
+        // 2. 透過画像を元画像の上に描画（アスペクト比を維持し、下中央に配置）
+        if (baseImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
+            const overlayAspect = overlayImage.naturalWidth / overlayImage.naturalHeight;
+
+            drawWidth = imageCanvas.width;
+            drawHeight = drawWidth / overlayAspect;
+
+            if (drawHeight > imageCanvas.height) {
+                drawHeight = imageCanvas.height;
+                drawWidth = drawHeight * overlayAspect;
+            }
+
+            overlayDrawX = (imageCanvas.width - drawWidth) / 2;
+            overlayDrawY = imageCanvas.height - drawHeight;
+
+            ctx.drawImage(overlayImage, overlayDrawX, overlayDrawY, drawWidth, drawHeight);
+
+            overlayDrawWidth = drawWidth;
+            overlayDrawHeight = drawHeight;
+
+        } else if (!baseImage) {
+            // 元画像がない場合は透過画像も描画しない
+        } else {
+            console.warn('透過画像がまだ読み込まれていないか、破損しています。');
+        }
+
+        // 3. テキストを描画
+        if (currentText && baseImage) {
+            // Canvasコンテキストのスタイル設定
+            // ここで currentFontSize を直接使用し、文字列を生成
+            ctx.font = `${currentFontSize}px "${fontFamily}"`; 
+            ctx.fillStyle = fillStyle;
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+
+            // テキストのX座標: 透過画像の左端位置 + スライダーのオフセット
+            const textX = overlayDrawX + currentPosXOffset;
+            // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - スライダーのオフセット (透過画像の下端から上へ)
+            const textY = overlayDrawY + overlayDrawHeight - currentPosYOffset;
+
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic'; 
+
+            ctx.fillText(currentText, textX, textY);
+            if (lineWidth > 0) {
+                ctx.strokeText(currentText, textX, textY);
+            }
+        }
+    }
+
+    // Canvasとボタンの状態をリセットする関数
+    function resetCanvasAndButtons() {
+        baseImage = null;
+        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+        imageCanvas.width = 0;
+        imageCanvas.height = 0;
+        downloadButton.disabled = true;
+        messageElement.classList.add('hidden');
+    }
+
+    // --- 初期化 ---
+    downloadButton.disabled = true; // 初期状態ではダウンロードボタンを無効化
+    updateTextSettings(); // 初期表示時にスライダーの値を反映
+});
