@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (e) => {
                 baseImage = new Image();
                 baseImage.onload = () => {
+                    // Canvasのサイズを元画像に合わせる (DPI非考慮)
                     imageCanvas.width = baseImage.width;
                     imageCanvas.height = baseImage.height;
 
@@ -145,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Canvasをクリアする前に、以前のDPIスケーリングがあればリセット
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.setTransform(1, 0, 0, 1, 0, 0); 
         ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
 
         // 1. 元画像を背景に描画
@@ -195,46 +196,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. テキストを描画
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
             // Canvasコンテキストのスタイル設定
-            ctx.font = `${currentFontSize}px "${fixedFontFamily}"`; // スライダーの値を適用
+            // ここでfixedFontSizeではなくcurrentFontSizeを使用
+            ctx.font = `<span class="math-inline">\{currentFontSize\}px "</span>{fixedFontFamily}"`; 
             ctx.fillStyle = fixedFillStyle;
             ctx.strokeStyle = fixedStrokeStyle;
             ctx.lineWidth = fixedLineWidth;
 
             // テキストのX座標: 透過画像の左端位置 + スライダーのオフセット
             const textX = overlayDrawX + currentPosXOffset;
-            // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - スライダーのオフセット (透過画像の下端から上へ)
-            const textY = overlayDrawY + overlayDrawHeight - currentPosYOffset;
-
-            ctx.textAlign = 'left';          // 水平方向を左端に揃える
-            ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（一般的な文字のベースライン）
-
-            ctx.fillText(currentText, textX, textY);
-            if (fixedLineWidth > 0) {
-                ctx.strokeText(currentText, textX, textY);
-            }
-        }
-    }
-
-    // ダウンロードボタンがクリックされたときの処理
-    downloadButton.addEventListener('click', () => {
-        if (baseImage && imageCanvas.width > 0 && imageCanvas.height > 0) {
-            const dataURL = imageCanvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = 'merged_image.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } else {
-            alert('合成する画像がありません。元画像をアップロードしてください。');
-        }
-    });
-
-    // 初期状態ではダウンロードボタンを無効化
-    downloadButton.disabled = true;
-
-    // 初期表示時に現在のスライダー値を表示
-    currentFontSizeSpan.textContent = `${fontSizeSlider.value}px`;
-    currentPosXSpan.textContent = `${posXSlider.value}px`;
-    currentPosYSpan.textContent = `${posYSlider.value}px`;
-});
+            // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - スライダーのオフセット (透過画像の下端から
