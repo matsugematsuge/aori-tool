@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>画像に透過画像を重ねるツール</title>
+    <title>あんなこといいな</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>画像に透過画像を重ねるツール</h1>
+        <h1>モニカにあんなことこんなこと言わせらレール</h1>
 
-        <p>元になる画像をアップロードしてください。透過画像が自動で重ねられます。</p>
+        <p>元画像をアップロードするとモニカ画像が自動で重ねられます</p>
 
         <div class="input-section">
             <label for="baseImageInput" class="button">
@@ -20,9 +20,9 @@
         </div>
 
         <div class="text-input-section">
-            <label for="inputText">描画するテキスト:</label>
+            <label for="inputText">言わせたいこと:</label>
             <input type="text" id="inputText" placeholder="ここにテキストを入力" value="サンプルテキスト">
-            <button id="drawTextButton" class="button">テキストを描画</button>
+            <button id="drawTextButton" class="button">OK!</button>
         </div>
 
         <div class="canvas-area">
@@ -38,23 +38,23 @@
             </div>
 
             <div class="control-group">
-                <label for="posXSlider">X位置 (透過画像左端からのオフセット):</label>
+                <label for="posXSlider">位置調整（横）:</label>
                 <input type="range" id="posXSlider" min="-100" max="200" value="35">
                 <span id="currentPosX">35px</span>
             </div>
 
             <div class="control-group">
-                <label for="posYSlider">Y位置 (透過画像下端からのオフセット):</label>
+                <label for="posYSlider">位置調整（縦）:</label>
                 <input type="range" id="posYSlider" min="-100" max="200" value="70">
                 <span id="currentPosY">70px</span>
             </div>
         </div>
         
         <div class="controls-section">
-            <button id="downloadButton" disabled class="button primary">合成画像をダウンロード</button>
+            <button id="downloadButton" disabled class="button primary">画像をダウンロード</button>
         </div>
 
-        <p class="note">※処理は全てブラウザ上で行われるため、画像がサーバーにアップロードされることはありません。</p>
+        <p class="note">※処理は全てブラウザ上で行われるため、画像がサーバーにアップロードされることはありません。安心してあんなこといいな、こんなこといいな、言わせてください</p>
     </div>
 
     <script src="script.js"></script>
