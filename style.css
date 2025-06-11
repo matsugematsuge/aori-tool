@@ -50,6 +50,43 @@ p {
     gap: 10px;
 }
 
+.text-control-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 中央寄せ */
+    flex-wrap: wrap; /* 小さい画面で折り返す */
+    margin-bottom: 10px;
+    gap: 10px; /* 要素間の隙間 */
+}
+
+.control-group label {
+    font-weight: bold;
+    color: #555;
+    min-width: 150px; /* ラベルの幅を固定して揃える */
+    text-align: right; /* ラベルを右寄せ */
+}
+
+.control-group input[type="range"] {
+    flex-grow: 1; /* スライダーが利用可能なスペースを埋める */
+    max-width: 300px; /* 最大幅 */
+    margin: 0 10px; /* 左右に少し余白 */
+}
+
+.control-group span {
+    font-weight: bold;
+    color: #007bff;
+    min-width: 50px; /* 値の表示領域を固定 */
+    text-align: left; /* 値を左寄せ */
+}
+
 .button {
     display: inline-block;
     background-color: #007bff;
@@ -177,6 +214,29 @@ button:disabled {
         width: 100%;
         text-align: left;
         margin-bottom: 5px;
+    }
+
+    .text-control-section .control-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .text-control-section .control-group label {
+        width: 100%;
+        text-align: left;
+        min-width: unset;
+    }
+
+    .text-control-section .control-group input[type="range"] {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .text-control-section .control-group span {
+        width: 100%;
+        text-align: left;
     }
 
     .canvas-area {
