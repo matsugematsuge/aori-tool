@@ -8,13 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputText = document.getElementById('inputText');
     const drawTextButton = document.getElementById('drawTextButton');
 
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    const fontSizeValue = document.getElementById('fontSizeValue');
-    const fontFamilyInput = document.getElementById('fontFamilyInput'); // 新しく追加
-    const textXInput = document.getElementById('textXInput');
-    const textYInput = document.getElementById('textYInput');
-    const applyTextPositionButton = document.getElementById('applyTextPositionButton');
-    const resetTextPositionButton = document.getElementById('resetTextPositionButton');
+    // 固定するテキスト描画設定
+    const fixedFontSize = 13; // 13pxに固定
+    const fixedFontFamily = 'sans-serif'; // ゴシック系フォント (多くのシステムで利用可能)
+    const fixedFillStyle = 'black'; // 黒に固定
+    const fixedStrokeStyle = 'transparent'; // 縁は透明 (必要なければ削除してもOK)
+    const fixedLineWidth = 0; // 縁の太さ (縁がないので0)
+
+    // 固定するY座標のオフセット (下から少し上)
+    // Canvasの高さからこの値を引いた位置がテキストのY座標になる
+    const fixedBottomOffset = 20; // 画像の下端から20px上に固定
 
     let baseImage = null;
     let overlayImage = new Image();
@@ -22,15 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     overlayImage.src = 'transparent_overlay.webp'; // または 'transparent_overlay.png'
     overlayImage.crossOrigin = "Anonymous";
 
-    // テキスト描画のための変数
-    let currentText = "";
-    let textFontSize = parseInt(fontSizeInput.value); // 初期フォントサイズ
-    let textFontFamily = fontFamilyInput.value; // 初期フォント
-    let textX = 0; // テキストのX座標
-    let textY = 0; // テキストのY座標
-
-    // スライダーの初期値を表示に反映
-    fontSizeValue.textContent = `${textFontSize}px`;
+    let currentText = ""; // ユーザーが入力したテキスト
 
     // 透過画像が読み込まれたらメッセージを非表示にする
     overlayImage.onload = () => {
@@ -61,19 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     imageCanvas.width = baseImage.width;
                     imageCanvas.height = baseImage.height;
 
-                    // テキストの初期位置を画像の中央に設定
-                    textX = imageCanvas.width / 2;
-                    textY = imageCanvas.height / 2;
-                    textXInput.value = Math.round(textX); // 入力フィールドにも反映
-                    textYInput.value = Math.round(textY); // 入力フィールドにも反映
-
-                    // フォントサイズの初期値を画像のサイズに基づいて調整（オプション）
-                    // 例えば、画像の高さの1/10を初期サイズにするなど
-                    // textFontSize = Math.max(10, Math.min(200, Math.round(imageCanvas.height * 0.1)));
-                    // fontSizeInput.value = textFontSize;
-                    // fontSizeValue.textContent = `${textFontSize}px`;
-
-                    drawImages();
+                    drawImages(); // 画像が読み込まれたら描画
                     downloadButton.disabled = false;
                     messageElement.classList.add('hidden');
                 };
@@ -98,55 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 「テキストを描画」ボタンがクリックされたときの処理
     drawTextButton.addEventListener('click', () => {
-        if (baseImage) {
-            currentText = inputText.value;
-            drawImages();
+        if (baseImage) { // 元画像が読み込まれている場合のみ描画
+            currentText = inputText.value; // 入力されたテキストを保存
+            drawImages(); // 再描画してテキストを反映
         } else {
             alert('元画像を先にアップロードしてください。');
         }
     });
-
-    // フォントサイズスライダーのイベントリスナー
-    fontSizeInput.addEventListener('input', () => {
-        textFontSize = parseInt(fontSizeInput.value);
-        fontSizeValue.textContent = `${textFontSize}px`;
-        if (baseImage) { // 画像が読み込まれていればリアルタイムで反映
-            drawImages();
-        }
-    });
-
-    // フォントファミリー選択のイベントリスナー
-    fontFamilyInput.addEventListener('change', () => {
-        textFontFamily = fontFamilyInput.value;
-        if (baseImage) { // 画像が読み込まれていればリアルタイムで反映
-            drawImages();
-        }
-    });
-
-    // 位置適用ボタンのイベントリスナー
-    applyTextPositionButton.addEventListener('click', () => {
-        if (baseImage) {
-            textX = parseInt(textXInput.value);
-            textY = parseInt(textYInput.value);
-            drawImages();
-        } else {
-            alert('元画像を先にアップロードしてください。');
-        }
-    });
-
-    // 位置リセットボタンのイベントリスナー
-    resetTextPositionButton.addEventListener('click', () => {
-        if (baseImage) {
-            textX = imageCanvas.width / 2;
-            textY = imageCanvas.height / 2;
-            textXInput.value = Math.round(textX);
-            textYInput.value = Math.round(textY);
-            drawImages();
-        } else {
-            alert('元画像を先にアップロードしてください。');
-        }
-    });
-
 
     // 画像を描画する関数 (テキスト描画ロジックを含む)
     function drawImages() {
@@ -164,15 +105,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // テキストの描画
         if (currentText && baseImage) {
-            ctx.font = `bold ${textFontSize}px "${textFontFamily}"`; // フォントとサイズ、スタイルを設定
-            ctx.fillStyle = 'white';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = textFontSize / 20; // 太字の太さもフォントサイズに合わせる
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`;
+            ctx.fillStyle = fixedFillStyle;
+            ctx.strokeStyle = fixedStrokeStyle;
+            ctx.lineWidth = fixedLineWidth;
+
+            // テキストのX座標を中央に固定
+            const textX = imageCanvas.width / 2;
+            // テキストのY座標を下から少し上に固定
+            // textBaselineを'alphabetic'（デフォルト）として、フォントのベースラインがY座標に来るようにする
+            // もしテキストが完全にY座標の上に来るようにしたい場合は、textBaselineを'bottom'に変更し、
+            // Y座標を fixedBottomOffset そのままにする
+            const textY = imageCanvas.height - fixedBottomOffset;
+
+            ctx.textAlign = 'center'; // 水平方向の中心に揃える
+            ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（下から上に描画される文字の一般的な基準）
 
             ctx.fillText(currentText, textX, textY);
-            ctx.strokeText(currentText, textX, textY);
+            if (fixedLineWidth > 0) { // 縁の太さが0より大きい場合のみ描画
+                ctx.strokeText(currentText, textX, textY);
+            }
         }
     }
 
