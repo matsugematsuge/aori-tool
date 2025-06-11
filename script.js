@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawTextButton = document.getElementById('drawTextButton');
 
     // 固定するテキスト描画設定
-    const fixedFontSize = 25; // 25pxに固定
+    const fixedFontSize = 24; // 24pxに固定
     const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
     const fixedFillStyle = 'black'; // 黒に固定
     const fixedStrokeStyle = 'transparent'; // 縁は透明
@@ -118,44 +118,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // テキストの描画
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
             // Canvasコンテキストのスタイル設定
-            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`;
+            ctx.font = `<span class="math-inline">\{fixedFontSize\}px "</span>{fixedFontFamily}"`;
             ctx.fillStyle = fixedFillStyle;
             ctx.strokeStyle = fixedStrokeStyle;
             ctx.lineWidth = fixedLineWidth;
 
-            // テキストのX座標: 中央から左にオフセット
-            const textX = (imageCanvas.width / 2) - fixedOffsetX;
+            // テキストのX座標: 画像の左端から右にオフセット
+            // textAlignを 'left' にすることで、このX座標がテキストの左端になる
+            const textX = (imageCanvas.width / 2) - fixedOffsetX; // 中央から左に150px移動した点が左端
             // テキストのY座標: 下から上にオフセット
             const textY = imageCanvas.height - fixedBottomOffset;
 
-            ctx.textAlign = 'center';       // 水平方向の中心に揃える
+            ctx.textAlign = 'left';          // 水平方向を左端に揃える
             ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（一般的な文字のベースライン）
-
-            ctx.fillText(currentText, textX, textY);
-            if (fixedLineWidth > 0) {
-                ctx.strokeText(currentText, textX, textY);
-            }
-        }
-    }
-
-    // ダウンロードボタンがクリックされたときの処理
-    downloadButton.addEventListener('click', () => {
-        if (baseImage && imageCanvas.width > 0 && imageCanvas.height > 0) {
-            const dataURL = imageCanvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = 'merged_image.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } else {
-            alert('合成する画像がありません。元画像をアップロードしてください。');
-        }
-    });
-
-    // 初期状態ではダウンロードボタンを無効化
-    downloadButton.disabled = true;
-
-    // ページロード時の初期描画は行わないため、overlayImage.onload からの呼び出しは削除
-    // Canvasの初期状態は空にするため、明示的な初期描画処理は不要
-});
