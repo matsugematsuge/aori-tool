@@ -25,35 +25,6 @@
             <button id="drawTextButton" class="button">テキストを描画</button>
         </div>
 
-        <div class="text-controls-section">
-            <div class="control-group">
-                <label for="fontSizeInput">文字サイズ:</label>
-                <input type="range" id="fontSizeInput" min="10" max="200" value="50">
-                <span id="fontSizeValue">50px</span>
-            </div>
-            <div class="control-group">
-                <label for="fontFamilyInput">フォント:</label>
-                <select id="fontFamilyInput">
-                    <option value="Arial">Arial</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Helvetica">Helvetica</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Impact">Impact</option>
-                    <option value="Brush Script MT">Brush Script MT</option>
-                    </select>
-            </div>
-            <div class="control-group">
-                <label for="textXInput">X座標:</label>
-                <input type="number" id="textXInput" min="0" value="0">
-                <label for="textYInput">Y座標:</label>
-                <input type="number" id="textYInput" min="0" value="0">
-            </div>
-            <button id="applyTextPositionButton" class="button">位置を適用</button>
-            <button id="resetTextPositionButton" class="button">位置リセット</button>
-        </div>
-
         <div class="canvas-area">
             <canvas id="imageCanvas"></canvas>
             <p id="message" class="hidden">画像を読み込み中です...</p>
