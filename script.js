@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawTextButton = document.getElementById('drawTextButton');
 
     // 固定するテキスト描画設定
-    const fixedFontSize = 20; // 20pxに固定
+    const fixedFontSize = 25; // 25pxに固定
     const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
     const fixedFillStyle = 'black'; // 黒に固定
     const fixedStrokeStyle = 'transparent'; // 縁は透明
