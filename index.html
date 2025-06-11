@@ -39,4 +39,24 @@
 
             <div class="control-group">
                 <label for="posXSlider">X位置 (透過画像左端からのオフセット):</label>
-                <input type="range" id
+                <input type="range" id="posXSlider" min="-100" max="200" value="35">
+                <span id="currentPosX">35px</span>
+            </div>
+
+            <div class="control-group">
+                <label for="posYSlider">Y位置 (透過画像下端からのオフセット):</label>
+                <input type="range" id="posYSlider" min="-100" max="200" value="70">
+                <span id="currentPosY">70px</span>
+            </div>
+        </div>
+        
+        <div class="controls-section">
+            <button id="downloadButton" disabled class="button primary">合成画像をダウンロード</button>
+        </div>
+
+        <p class="note">※処理は全てブラウザ上で行われるため、画像がサーバーにアップロードされることはありません。</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
