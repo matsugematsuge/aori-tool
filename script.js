@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadButton = document.getElementById('downloadButton');
     const messageElement = document.getElementById('message');
 
-    // inputText が textarea になったことを想定
+    // inputText は textarea になったことを想定
     const inputText = document.getElementById('inputText');
     const drawTextButton = document.getElementById('drawTextButton');
 
