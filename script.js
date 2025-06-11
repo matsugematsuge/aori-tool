@@ -11,21 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 固定するテキスト描画設定
     const fixedFontSize = 13; // 13pxに固定
     // より確実にゴシック体に見せるためのフォント指定
-    // 'Yu Gothic', 'Meiryo' はWindowsでよく使われるゴシック体
-    // 'Hiragino Kaku Gothic ProN' はmacOSでよく使われるゴシック体
-    // 'sans-serif' はシステムに依存する一般的なゴシック系フォールバック
     const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif';
     const fixedFillStyle = 'black'; // 黒に固定
-    const fixedStrokeStyle = 'transparent'; // 縁は透明 (必要なければ削除してもOK)
-    const fixedLineWidth = 0; // 縁の太さ (縁がないので0)
+    const fixedStrokeStyle = 'transparent'; // 縁は透明
+    const fixedLineWidth = 0; // 縁の太さ
 
     // 固定するY座標のオフセット (下から少し上)
     const fixedBottomOffset = 20; // 画像の下端から20px上に固定 (ピクセル単位)
 
     let baseImage = null;
     let overlayImage = new Image();
-    // ここで固定の透過画像のパスを指定します
-    overlayImage.src = 'transparent_overlay.webp'; // または 'transparent_overlay.png'
+    // 透過画像の名前を 'overlay.webp' に変更
+    overlayImage.src = 'overlay.webp';
     overlayImage.crossOrigin = "Anonymous";
 
     let currentText = ""; // ユーザーが入力したテキスト
@@ -33,10 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 透過画像が読み込まれたらメッセージを非表示にする
     overlayImage.onload = () => {
         console.log('透過画像が読み込まれました。');
-        // 元画像が読み込まれているか、またはテキストが入力されている場合に描画
-        // overlayImage.onloadは画像ファイルがキャッシュされていると発火しない場合があるため、
-        // drawImages()の呼び出しはbaseImageInputのchangeイベントとdrawTextButtonのclickイベントに絞る
-        if (baseImage && currentText) { // 両方が揃っていれば描画
+        // 元画像とテキストが揃っていれば描画を試みる
+        if (baseImage && currentText) {
              drawImages();
         }
     };
@@ -112,12 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (overlayImage.complete && overlayImage.naturalWidth > 0) {
             ctx.drawImage(overlayImage, 0, 0, imageCanvas.width, imageCanvas.height);
         } else {
-            // エラー時でも処理が止まらないようにconsole.warnにとどめる
             console.warn('透過画像がまだ読み込まれていないか、破損しています。');
         }
 
         // テキストの描画
-        // ここでフォント、色、位置の設定を行うことが非常に重要です
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
             // Canvasコンテキストのスタイル設定
             ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`; // サイズとフォントを適用
@@ -128,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // テキストのX座標を中央に固定
             const textX = imageCanvas.width / 2;
             // テキストのY座標を下から少し上に固定
-            // 'alphabetic' はベースラインを文字の下部に合わせるので、fixedBottomOffset は下からの余白として機能する
             const textY = imageCanvas.height - fixedBottomOffset;
 
             ctx.textAlign = 'center';       // 水平方向の中心に揃える
