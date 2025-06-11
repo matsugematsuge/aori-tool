@@ -10,14 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 固定するテキスト描画設定
     const fixedFontSize = 13; // 13pxに固定
-    const fixedFontFamily = 'sans-serif'; // ゴシック系フォント (多くのシステムで利用可能)
+    // より確実にゴシック体に見せるためのフォント指定
+    // 'Yu Gothic', 'Meiryo' はWindowsでよく使われるゴシック体
+    // 'Hiragino Kaku Gothic ProN' はmacOSでよく使われるゴシック体
+    // 'sans-serif' はシステムに依存する一般的なゴシック系フォールバック
+    const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif';
     const fixedFillStyle = 'black'; // 黒に固定
     const fixedStrokeStyle = 'transparent'; // 縁は透明 (必要なければ削除してもOK)
     const fixedLineWidth = 0; // 縁の太さ (縁がないので0)
 
     // 固定するY座標のオフセット (下から少し上)
-    // Canvasの高さからこの値を引いた位置がテキストのY座標になる
-    const fixedBottomOffset = 20; // 画像の下端から20px上に固定
+    const fixedBottomOffset = 20; // 画像の下端から20px上に固定 (ピクセル単位)
 
     let baseImage = null;
     let overlayImage = new Image();
@@ -30,8 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 透過画像が読み込まれたらメッセージを非表示にする
     overlayImage.onload = () => {
         console.log('透過画像が読み込まれました。');
-        if (baseImage || currentText) {
-            drawImages();
+        // 元画像が読み込まれているか、またはテキストが入力されている場合に描画
+        // overlayImage.onloadは画像ファイルがキャッシュされていると発火しない場合があるため、
+        // drawImages()の呼び出しはbaseImageInputのchangeイベントとdrawTextButtonのclickイベントに絞る
+        if (baseImage && currentText) { // 両方が揃っていれば描画
+             drawImages();
         }
     };
 
@@ -91,35 +97,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 画像を描画する関数 (テキスト描画ロジックを含む)
     function drawImages() {
+        // Canvasの描画バッファが0の場合、描画しない
+        if (imageCanvas.width === 0 || imageCanvas.height === 0) {
+            return;
+        }
+
         ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
 
         if (baseImage) {
             ctx.drawImage(baseImage, 0, 0, imageCanvas.width, imageCanvas.height);
         }
 
+        // 透過画像が読み込まれていれば描画
         if (overlayImage.complete && overlayImage.naturalWidth > 0) {
             ctx.drawImage(overlayImage, 0, 0, imageCanvas.width, imageCanvas.height);
         } else {
+            // エラー時でも処理が止まらないようにconsole.warnにとどめる
             console.warn('透過画像がまだ読み込まれていないか、破損しています。');
         }
 
         // テキストの描画
-        if (currentText && baseImage) {
-            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`;
-            ctx.fillStyle = fixedFillStyle;
-            ctx.strokeStyle = fixedStrokeStyle;
-            ctx.lineWidth = fixedLineWidth;
+        // ここでフォント、色、位置の設定を行うことが非常に重要です
+        if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
+            // Canvasコンテキストのスタイル設定
+            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`; // サイズとフォントを適用
+            ctx.fillStyle = fixedFillStyle; // 塗りつぶし色を適用
+            ctx.strokeStyle = fixedStrokeStyle; // 縁の色を適用
+            ctx.lineWidth = fixedLineWidth; // 縁の太さを適用
 
             // テキストのX座標を中央に固定
             const textX = imageCanvas.width / 2;
             // テキストのY座標を下から少し上に固定
-            // textBaselineを'alphabetic'（デフォルト）として、フォントのベースラインがY座標に来るようにする
-            // もしテキストが完全にY座標の上に来るようにしたい場合は、textBaselineを'bottom'に変更し、
-            // Y座標を fixedBottomOffset そのままにする
+            // 'alphabetic' はベースラインを文字の下部に合わせるので、fixedBottomOffset は下からの余白として機能する
             const textY = imageCanvas.height - fixedBottomOffset;
 
-            ctx.textAlign = 'center'; // 水平方向の中心に揃える
-            ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（下から上に描画される文字の一般的な基準）
+            ctx.textAlign = 'center';       // 水平方向の中心に揃える
+            ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（一般的な文字のベースライン）
 
             ctx.fillText(currentText, textX, textY);
             if (fixedLineWidth > 0) { // 縁の太さが0より大きい場合のみ描画
@@ -143,5 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 初期状態ではダウンロードボタンを無効化
     downloadButton.disabled = true;
 });
