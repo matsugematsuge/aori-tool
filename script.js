@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadButton = document.getElementById('downloadButton');
     const messageElement = document.getElementById('message');
 
-    // 新しく追加する要素
     const inputText = document.getElementById('inputText');
     const drawTextButton = document.getElementById('drawTextButton');
 
@@ -47,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (e) => {
                 baseImage = new Image();
                 baseImage.onload = () => {
-                    // キャンバスのサイズを元画像に合わせる
+                    // ここは元画像の解像度に合わせてCanvasの描画バッファサイズを設定するため、残します。
                     imageCanvas.width = baseImage.width;
                     imageCanvas.height = baseImage.height;
 
@@ -72,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // ファイルが選択されていない場合はキャンバスをクリアし、ボタンを無効化
             baseImage = null;
             ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-            imageCanvas.width = 0; // キャンバスのサイズをリセット
+            // キャンバスの描画サイズをリセットするが、CSSで表示サイズは制御される
+            imageCanvas.width = 0;
             imageCanvas.height = 0;
             downloadButton.disabled = true;
             messageElement.classList.add('hidden');
@@ -108,19 +108,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // テキストの描画
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
-            ctx.font = 'bold 50px Arial'; // フォント、サイズ、スタイルを設定
-            ctx.fillStyle = 'white'; // テキストの色
-            ctx.strokeStyle = 'black'; // テキストの縁の色
-            ctx.lineWidth = 2; // テキストの縁の太さ
-            ctx.textAlign = 'center'; // 水平方向の中心に揃える
-            ctx.textBaseline = 'middle'; // 垂直方向の中心に揃える
+            // テキストのサイズをCanvasの幅に基づいて動的に調整
+            // 例: Canvas幅の約10%の高さのフォントにする
+            const fontSize = imageCanvas.width * 0.1; // 適切な比率に調整
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = fontSize / 20; // 太字の太さもフォントサイズに合わせる
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
 
             ctx.fillText(currentText, textX, textY); // テキストを塗りつぶしで描画
             ctx.strokeText(currentText, textX, textY); // テキストの縁を描画
-
-            // ※テキストの位置調整（例: テキストボックスの下に表示するなど）は、
-            //   textX, textY の値を調整することで可能です。
-            //   ユーザーがドラッグして位置を調整する機能などは、さらに高度なJavaScriptが必要です。
         }
     }
 
