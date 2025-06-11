@@ -1,32 +1,32 @@
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 20px; /* PCでは余白、スマホでは調整 */
+    padding: 20px;
     background-color: #f4f7f6;
     color: #333;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* 上部に寄せる */
+    align-items: flex-start;
     min-height: 100vh;
     box-sizing: border-box;
 }
 
 .container {
     background-color: #fff;
-    padding: 30px; /* PCでは広め、スマホでは調整 */
+    padding: 30px;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 900px; /* 最大幅を設定 */
-    width: 100%; /* 親要素の100%を使用 */
+    max-width: 900px;
+    width: 100%;
     margin-top: 30px;
-    box-sizing: border-box; /* paddingとborderをwidthに含める */
+    box-sizing: border-box;
 }
 
 h1 {
     color: #2c3e50;
     margin-bottom: 20px;
-    font-size: 2em; /* 相対単位を使用 */
+    font-size: 2em;
 }
 
 p {
@@ -34,13 +34,75 @@ p {
     margin-bottom: 15px;
 }
 
-.input-section, .controls-section, .text-input-section {
+.input-section, .controls-section {
     margin-bottom: 25px;
-    display: flex; /* Flexboxで横並び */
-    flex-wrap: wrap; /* 要素が収まらない場合に折り返す */
-    justify-content: center; /* 中央揃え */
-    gap: 10px; /* 要素間の隙間 */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
 }
+
+.text-input-section {
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.text-controls-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.control-group label {
+    font-weight: bold;
+    color: #555;
+}
+
+.control-group input[type="range"] {
+    flex-grow: 1;
+    min-width: 120px;
+}
+
+.control-group input[type="number"] {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* フォント選択のスタイル */
+.control-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 1em;
+    cursor: pointer;
+}
+.control-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
 
 .button {
     display: inline-block;
@@ -53,7 +115,7 @@ p {
     font-size: 1.1em;
     transition: background-color 0.3s ease, transform 0.2s ease;
     text-decoration: none;
-    white-space: nowrap; /* ボタン内のテキストが改行されないように */
+    white-space: nowrap;
 }
 
 .button:hover {
@@ -82,8 +144,8 @@ input[type="file"] {
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1em;
-    flex-grow: 1; /* スペースに合わせて伸びる */
-    max-width: 300px; /* 最大幅 */
+    flex-grow: 1;
+    max-width: 300px;
 }
 
 .canvas-area {
@@ -99,9 +161,9 @@ input[type="file"] {
 }
 
 canvas {
-    max-width: 100%; /* 親要素に合わせて幅を調整 */
-    height: auto; /* アスペクト比を維持 */
-    display: block; /* 余分なスペースを削除 */
+    max-width: 100%;
+    height: auto;
+    display: block;
     border-radius: 5px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -109,7 +171,7 @@ canvas {
 #message {
     color: #666;
     font-style: italic;
-    min-height: 1.5em; /* メッセージが表示されていない時にガタつかないように */
+    min-height: 1.5em;
 }
 
 .hidden {
@@ -132,41 +194,56 @@ button:disabled {
 /* メディアクエリ (スマートフォン向け最適化)                 */
 /* ========================================================= */
 
-@media (max-width: 768px) { /* 768px以下の画面幅に適用 */
+@media (max-width: 768px) {
     body {
-        padding: 10px; /* 余白を減らす */
-        align-items: flex-start; /* 縦長になるので上寄せ */
+        padding: 10px;
+        align-items: flex-start;
     }
 
     .container {
-        padding: 20px 15px; /* 内側のパディングを調整 */
-        margin-top: 15px; /* 上部のマージンを調整 */
+        padding: 20px 15px;
+        margin-top: 15px;
     }
 
     h1 {
-        font-size: 1.6em; /* 見出しのフォントサイズを小さく */
+        font-size: 1.6em;
     }
 
     .button {
-        padding: 10px 20px; /* ボタンのパディングを小さく */
-        font-size: 1em; /* ボタンのフォントサイズを小さく */
-        width: 100%; /* スマホではボタンを横幅いっぱいに広げる */
-        box-sizing: border-box; /* パディングとボーダーを幅に含める */
+        padding: 10px 20px;
+        font-size: 1em;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    .input-section, .controls-section, .text-input-section {
-        flex-direction: column; /* 要素を縦に並べる */
-        gap: 15px; /* 縦方向の隙間を調整 */
+    .input-section, .controls-section, .text-input-section, .text-controls-section {
+        flex-direction: column;
+        gap: 15px;
     }
 
-    .text-input-section input[type="text"] {
-        max-width: 100%; /* 最大幅を解除して100%にする */
+    .text-input-section input[type="text"],
+    .text-controls-section input[type="range"],
+    .text-controls-section input[type="number"],
+    .text-controls-section select { /* selectもフル幅に */
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    .text-input-section label {
-        width: 100%; /* ラベルも100%にして改行されるように */
-        text-align: left; /* 左寄せ */
-        margin-bottom: 5px; /* ラベルの下に少し余白 */
+    .text-input-section label,
+    .text-controls-section label {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px;
+    }
+
+    .control-group {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .control-group span {
+        align-self: flex-start;
     }
 
     .canvas-area {
@@ -174,6 +251,6 @@ button:disabled {
     }
 
     .note {
-        font-size: 0.8em; /* 注意書きのフォントサイズを小さく */
+        font-size: 0.8em;
     }
 }
