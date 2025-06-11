@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let baseImage = null;
     let overlayImage = new Image();
-    // 透過画像の名前を 'overlay.webp' に変更
-    overlayImage.src = 'overlay.webp';
+    // 透過画像の名前を 'overlay.png' に変更
+    overlayImage.src = 'overlay.png';
     overlayImage.crossOrigin = "Anonymous";
 
     let currentText = ""; // ユーザーが入力したテキスト
