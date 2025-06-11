@@ -25,6 +25,26 @@
             <button id="drawTextButton" class="button">テキストを描画</button>
         </div>
 
+        <div class="text-control-section">
+            <div class="control-group">
+                <label for="fontSizeSlider">フォントサイズ:</label>
+                <input type="range" id="fontSizeSlider" min="10" max="100" value="40">
+                <span id="currentFontSize">40px</span>
+            </div>
+
+            <div class="control-group">
+                <label for="posXSlider">X位置 (透過画像左端からのオフセット):</label>
+                <input type="range" id="posXSlider" min="-100" max="200" value="35">
+                <span id="currentPosX">35px</span>
+            </div>
+
+            <div class="control-group">
+                <label for="posYSlider">Y位置 (透過画像下端からのオフセット):</label>
+                <input type="range" id="posYSlider" min="-100" max="200" value="70">
+                <span id="currentPosY">70px</span>
+            </div>
+        </div>
+
         <div class="canvas-area">
             <canvas id="imageCanvas"></canvas>
             <p id="message" class="hidden">画像を読み込み中です...</p>
