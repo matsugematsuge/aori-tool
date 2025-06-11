@@ -8,23 +8,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputText = document.getElementById('inputText');
     const drawTextButton = document.getElementById('drawTextButton');
 
-    // 固定するテキスト描画設定
-    const fixedFontSize = 145px; // 
+    // スライダーと値表示要素の取得
+    const fontSizeSlider = document.getElementById('fontSizeSlider');
+    const currentFontSizeSpan = document.getElementById('currentFontSize');
+    const posXSlider = document.getElementById('posXSlider');
+    const currentPosXSpan = document.getElementById('currentPosX');
+    const posYSlider = document.getElementById('posYSlider');
+    const currentPosYSpan = document.getElementById('currentPosY');
+
+    // 初期値設定 (HTMLのvalue属性と合わせる)
+    let currentFontSize = parseInt(fontSizeSlider.value);
+    let currentPosXOffset = parseInt(posXSlider.value);
+    let currentPosYOffset = parseInt(posYSlider.value);
+
+    // テキスト描画の固定設定
     const fixedFontFamily = '"Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif'; // ゴシック体
     const fixedFillStyle = 'black'; // 黒に固定
     const fixedStrokeStyle = 'transparent'; // 縁は透明
     const fixedLineWidth = 0; // 縁の太さ
-
-    // テキストの固定位置オフセット (透過画像基準)
-    const textOffsetXFromOverlayLeft = 35; // 透過画像の左端から右に35px
-    const textOffsetYFromOverlayBottom = 70; // 透過画像の下端から上に70px
 
     let baseImage = null;
     let overlayImage = new Image();
     overlayImage.src = 'overlay.png'; // 透過画像の名前は 'overlay.png'
     overlayImage.crossOrigin = "Anonymous"; // CORSエラーを避けるため
 
-    let currentText = ""; // ユーザーが入力したテキスト
+    let currentText = inputText.value; // 初期テキスト
 
     // 透過画像が読み込まれても、ここでは描画をトリガーしない
     overlayImage.onload = () => {
@@ -94,6 +102,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // テキスト入力欄が変更されたらリアルタイム描画
+    inputText.addEventListener('input', () => {
+        if (baseImage) {
+            currentText = inputText.value;
+            drawImages();
+        }
+    });
+
+    // フォントサイズスライダーの変更イベント
+    fontSizeSlider.addEventListener('input', (event) => {
+        currentFontSize = parseInt(event.target.value);
+        currentFontSizeSpan.textContent = `${currentFontSize}px`;
+        if (baseImage) {
+            drawImages();
+        }
+    });
+
+    // X位置スライダーの変更イベント
+    posXSlider.addEventListener('input', (event) => {
+        currentPosXOffset = parseInt(event.target.value);
+        currentPosXSpan.textContent = `${currentPosXOffset}px`;
+        if (baseImage) {
+            drawImages();
+        }
+    });
+
+    // Y位置スライダーの変更イベント
+    posYSlider.addEventListener('input', (event) => {
+        currentPosYOffset = parseInt(event.target.value);
+        currentPosYSpan.textContent = `${currentPosYOffset}px`;
+        if (baseImage) {
+            drawImages();
+        }
+    });
+
     // 画像とテキストを描画する関数
     function drawImages() {
         // Canvasのサイズが0の場合、描画しない
@@ -101,6 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Canvasをクリアする前に、以前のDPIスケーリングがあればリセット
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
 
         // 1. 元画像を背景に描画
@@ -150,15 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. テキストを描画
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
             // Canvasコンテキストのスタイル設定
-            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`;
+            ctx.font = `${currentFontSize}px "${fixedFontFamily}"`; // スライダーの値を適用
             ctx.fillStyle = fixedFillStyle;
             ctx.strokeStyle = fixedStrokeStyle;
             ctx.lineWidth = fixedLineWidth;
 
-            // テキストのX座標: 透過画像の左端位置 + オフセット
-            const textX = overlayDrawX + textOffsetXFromOverlayLeft;
-            // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - オフセット (透過画像の下端から上へ)
-            const textY = overlayDrawY + overlayDrawHeight - textOffsetYFromOverlayBottom;
+            // テキストのX座標: 透過画像の左端位置 + スライダーのオフセット
+            const textX = overlayDrawX + currentPosXOffset;
+            // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - スライダーのオフセット (透過画像の下端から上へ)
+            const textY = overlayDrawY + overlayDrawHeight - currentPosYOffset;
 
             ctx.textAlign = 'left';          // 水平方向を左端に揃える
             ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（一般的な文字のベースライン）
@@ -187,4 +232,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初期状態ではダウンロードボタンを無効化
     downloadButton.disabled = true;
+
+    // 初期表示時に現在のスライダー値を表示
+    currentFontSizeSpan.textContent = `${fontSizeSlider.value}px`;
+    currentPosXSpan.textContent = `${posXSlider.value}px`;
+    currentPosYSpan.textContent = `${posYSlider.value}px`;
 });
