@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let baseImage = null;
     let overlayImage = new Image();
     // ここで固定の透過画像のパスを指定します
-    overlayImage.src = 'transparent_overlay.png';
+    overlayImage.src = 'overlay.webp';
     overlayImage.crossOrigin = "Anonymous"; // CORS問題を避けるため（外部画像の場合）
 
     // テキストを描画するための変数
