@@ -16,20 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const fixedLineWidth = 0; // 縁の太さ
 
     // テキストの固定位置オフセット
-    const fixedOffsetX = 150; // 中央から左に150px
-    const fixedBottomOffset = 80; // 下から80px上に固定
+    const fixedOffsetX = 150; // 画像中央から左に150px移動した位置がテキストの左端
+    const fixedBottomOffset = 80; // 画像下端から80px上に固定
 
     let baseImage = null;
     let overlayImage = new Image();
     overlayImage.src = 'overlay.png'; // 透過画像の名前は 'overlay.png'
-    overlayImage.crossOrigin = "Anonymous";
+    overlayImage.crossOrigin = "Anonymous"; // CORSエラーを避けるため
 
     let currentText = ""; // ユーザーが入力したテキスト
 
     // 透過画像が読み込まれても、ここでは描画をトリガーしない
     overlayImage.onload = () => {
         console.log('透過画像が読み込まれました。');
-        // 初期表示では透過画像は描画せず、元画像が読み込まれた時に描画する
+        // 元画像が既に読み込まれている場合のみ、透過画像を再描画
+        if (baseImage) {
+            drawImages();
+        }
     };
 
     overlayImage.onerror = () => {
@@ -53,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     imageCanvas.width = baseImage.width;
                     imageCanvas.height = baseImage.height;
 
-                    drawImages(); // 画像が読み込まれたら描画
+                    drawImages(); // 元画像が読み込まれたら描画
                     downloadButton.disabled = false;
                     messageElement.classList.add('hidden');
                 };
@@ -100,34 +103,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
 
+        // 1. 元画像を背景に描画
         if (baseImage) {
             ctx.drawImage(baseImage, 0, 0, imageCanvas.width, imageCanvas.height);
         }
 
-        // 透過画像は baseImage が存在する場合のみ描画
+        // 2. 透過画像を元画像の上に描画（アスペクト比を維持し、下中央に配置）
         if (baseImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
-            ctx.drawImage(overlayImage, 0, 0, imageCanvas.width, imageCanvas.height);
+            const baseAspect = imageCanvas.width / imageCanvas.height;
+            const overlayAspect = overlayImage.naturalWidth / overlayImage.naturalHeight;
+
+            let drawWidth, drawHeight;
+            let drawX, drawY;
+
+            // 透過画像がCanvas（元画像）の幅に合わせて調整
+            drawWidth = imageCanvas.width;
+            drawHeight = drawWidth / overlayAspect;
+
+            // もし高さがCanvasの高さより大きい場合は、高さを基準に調整
+            if (drawHeight > imageCanvas.height) {
+                drawHeight = imageCanvas.height;
+                drawWidth = drawHeight * overlayAspect;
+            }
+
+            // X座標を中央に配置
+            drawX = (imageCanvas.width - drawWidth) / 2;
+            // Y座標を最下部に配置
+            drawY = imageCanvas.height - drawHeight;
+
+            ctx.drawImage(overlayImage, drawX, drawY, drawWidth, drawHeight);
+
         } else if (!baseImage) {
-            // 元画像がない場合で、Canvasが空の場合にメッセージを表示（オプション）
-            // messageElement.textContent = '元画像をアップロードしてください。';
-            // messageElement.classList.remove('hidden');
+            // 元画像がない場合は透過画像も描画しない
         } else {
             console.warn('透過画像がまだ読み込まれていないか、破損しています。');
         }
 
-        // テキストの描画
+        // 3. テキストを描画
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
             // Canvasコンテキストのスタイル設定
-            ctx.font = `<span class="math-inline">\{fixedFontSize\}px "</span>{fixedFontFamily}"`;
+            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`;
             ctx.fillStyle = fixedFillStyle;
             ctx.strokeStyle = fixedStrokeStyle;
             ctx.lineWidth = fixedLineWidth;
 
-            // テキストのX座標: 画像の左端から右にオフセット
+            // テキストのX座標: 画像の中央から左にオフセット
             // textAlignを 'left' にすることで、このX座標がテキストの左端になる
-            const textX = (imageCanvas.width / 2) - fixedOffsetX; // 中央から左に150px移動した点が左端
+            const textX = (imageCanvas.width / 2) - fixedOffsetX;
             // テキストのY座標: 下から上にオフセット
+            // textBaseline を 'alphabetic' に設定しているので、この Y 座標がフォントのベースラインになります。
             const textY = imageCanvas.height - fixedBottomOffset;
 
             ctx.textAlign = 'left';          // 水平方向を左端に揃える
             ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（一般的な文字のベースライン）
+
+            ctx.fillText(currentText, textX, textY);
+            if (fixedLineWidth > 0) {
+                ctx.strokeText(currentText, textX, textY);
+            }
+        }
+    }
+
+    // ダウンロードボタンがクリックされたときの処理
+    downloadButton.addEventListener('click', () => {
+        if (baseImage && imageCanvas.width > 0 && imageCanvas.height > 0) {
+            const dataURL = imageCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'merged_image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            alert('合成する画像がありません。元画像をアップロードしてください。');
+        }
+    });
+
+    // 初期状態ではダウンロードボタンを無効化
+    downloadButton.disabled = true;
+});
