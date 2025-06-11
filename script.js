@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadButton = document.getElementById('downloadButton');
     const messageElement = document.getElementById('message');
 
+    // inputText が textarea になったことを想定
     const inputText = document.getElementById('inputText');
     const drawTextButton = document.getElementById('drawTextButton');
 
@@ -22,11 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentText = inputText.value; // 初期テキスト
 
     // テキスト描画の固定設定
-    // ★ここを修正しました：より汎用的なフォントに変更
-    const fontFamily = 'Arial, sans-serif'; // または 'Verdana, sans-serif' など
+    const fontFamily = 'Arial, sans-serif'; // 汎用的なフォント
     const fillStyle = 'black'; // 黒に固定
     const strokeStyle = 'transparent'; // 縁は透明
     const lineWidth = 0; // 縁の太さ
+    const lineHeightMultiplier = 1.2; // 行の高さの倍率 (フォントサイズの1.2倍)
 
     let baseImage = null;
     let overlayImage = new Image();
@@ -93,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     inputText.addEventListener('input', () => {
+        // リアルタイムでテキストプレビュー
         if (baseImage) {
             currentText = inputText.value;
             drawImages();
@@ -113,10 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPosXSpan.textContent = `${currentPosXOffset}px`;
         currentPosYSpan.textContent = `${currentPosYOffset}px`;
 
-        console.log('スライダーで設定されたフォントサイズ:', currentFontSize); 
-
         if (baseImage) {
-            drawImages(); 
+            drawImages(); // 設定変更時にリアルタイムで再描画
         }
     }
 
@@ -159,8 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (baseImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
             const overlayAspect = overlayImage.naturalWidth / overlayImage.naturalHeight;
 
-            drawWidth = imageCanvas.width;
-            drawHeight = drawWidth / overlayAspect;
+            let drawWidth = imageCanvas.width;
+            let drawHeight = drawWidth / overlayAspect;
 
             if (drawHeight > imageCanvas.height) {
                 drawHeight = imageCanvas.height;
@@ -183,24 +183,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. テキストを描画
         if (currentText && baseImage) {
-            ctx.font = `${currentFontSize}px "${fontFamily}"`; // currentFontSizeを使用
+            ctx.font = `${currentFontSize}px "${fontFamily}"`; 
             ctx.fillStyle = fillStyle;
             ctx.strokeStyle = strokeStyle;
             ctx.lineWidth = lineWidth;
 
-            console.log('実際に描画に適用されるフォント設定文字列:', ctx.font); 
-            console.log('描画に適用されるフォントサイズ (currentFontSize):', currentFontSize); 
-
-            const textX = overlayDrawX + currentPosXOffset;
-            const textY = overlayDrawY + overlayDrawHeight - currentPosYOffset;
-
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic'; 
 
-            ctx.fillText(currentText, textX, textY);
-            if (lineWidth > 0) {
-                ctx.strokeText(currentText, textX, textY);
-            }
+            // テキストを改行文字で分割
+            const lines = currentText.split('\n');
+            // 行の高さ
+            const lineHeight = currentFontSize * lineHeightMultiplier;
+
+            // テキストブロックの最下行のベースラインが基準位置になるように調整
+            // Y座標の計算ロジックは、テキストブロック全体の高さを考慮して調整されます
+            let startY = overlayDrawY + overlayDrawHeight - currentPosYOffset; 
+            
+            // 最初の行のY座標 = startY - (行数 - 1) * 行の高さ
+            const totalTextHeight = (lines.length - 1) * lineHeight;
+            let currentLineY = startY - totalTextHeight;
+
+
+            lines.forEach((line, index) => {
+                const lineY = currentLineY + (index * lineHeight); // 各行のY座標
+                const textX = overlayDrawX + currentPosXOffset; // X座標は共通
+
+                ctx.fillText(line, textX, lineY);
+                if (lineWidth > 0) {
+                    ctx.strokeText(line, textX, lineY);
+                }
+            });
         }
     }
 
