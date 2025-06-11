@@ -120,21 +120,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 透過画像がCanvas（元画像）の幅に合わせて調整
             // まずは幅に合わせて拡大/縮小
-            overlayDrawWidth = imageCanvas.width;
-            overlayDrawHeight = overlayDrawWidth / overlayAspect;
+            drawWidth = imageCanvas.width;
+            drawHeight = drawWidth / overlayAspect;
 
             // もし幅に合わせて調整した高さがCanvasの高さより大きい場合は、高さを基準に調整
-            if (overlayDrawHeight > imageCanvas.height) {
-                overlayDrawHeight = imageCanvas.height;
-                overlayDrawWidth = overlayDrawHeight * overlayAspect;
+            if (drawHeight > imageCanvas.height) {
+                drawHeight = imageCanvas.height;
+                drawWidth = drawHeight * overlayAspect;
             }
 
             // X座標を中央に配置
-            overlayDrawX = (imageCanvas.width - overlayDrawWidth) / 2;
+            overlayDrawX = (imageCanvas.width - drawWidth) / 2;
             // Y座標を最下部に配置
-            overlayDrawY = imageCanvas.height - overlayDrawHeight;
+            overlayDrawY = imageCanvas.height - drawHeight;
 
-            ctx.drawImage(overlayImage, overlayDrawX, overlayDrawY, overlayDrawWidth, overlayDrawHeight);
+            // 透過画像を描画
+            ctx.drawImage(overlayImage, overlayDrawX, overlayDrawY, drawWidth, drawHeight);
+
+            // 透過画像の描画情報を保存 (テキストの位置計算に使うため)
+            overlayDrawWidth = drawWidth;
+            overlayDrawHeight = drawHeight;
 
         } else if (!baseImage) {
             // 元画像がない場合は透過画像も描画しない
@@ -145,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. テキストを描画
         if (currentText && baseImage) { // テキストがあり、元画像が読み込まれていれば描画
             // Canvasコンテキストのスタイル設定
-            ctx.font = `<span class="math-inline">\{fixedFontSize\}px "</span>{fixedFontFamily}"`;
+            ctx.font = `${fixedFontSize}px "${fixedFontFamily}"`;
             ctx.fillStyle = fixedFillStyle;
             ctx.strokeStyle = fixedStrokeStyle;
             ctx.lineWidth = fixedLineWidth;
@@ -153,4 +158,33 @@ document.addEventListener('DOMContentLoaded', () => {
             // テキストのX座標: 透過画像の左端位置 + オフセット
             const textX = overlayDrawX + textOffsetXFromOverlayLeft;
             // テキストのY座標: 透過画像の上端位置 + 透過画像の高さ - オフセット (透過画像の下端から上へ)
-            const textY
+            const textY = overlayDrawY + overlayDrawHeight - textOffsetYFromOverlayBottom;
+
+            ctx.textAlign = 'left';          // 水平方向を左端に揃える
+            ctx.textBaseline = 'alphabetic'; // 垂直方向の基準線（一般的な文字のベースライン）
+
+            ctx.fillText(currentText, textX, textY);
+            if (fixedLineWidth > 0) {
+                ctx.strokeText(currentText, textX, textY);
+            }
+        }
+    }
+
+    // ダウンロードボタンがクリックされたときの処理
+    downloadButton.addEventListener('click', () => {
+        if (baseImage && imageCanvas.width > 0 && imageCanvas.height > 0) {
+            const dataURL = imageCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'merged_image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            alert('合成する画像がありません。元画像をアップロードしてください。');
+        }
+    });
+
+    // 初期状態ではダウンロードボタンを無効化
+    downloadButton.disabled = true;
+});
